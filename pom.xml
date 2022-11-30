@@ -5,7 +5,7 @@
 
 	<groupId>org.springframework.data</groupId>
 	<artifactId>spring-data-solr</artifactId>
-	<version>4.4.0</version>
+	<version>4.4.1</version>
 
 	<name>Spring Data Solr</name>
 	<description>Spring Data module providing support for Apache Solr repositories.</description>
@@ -22,9 +22,10 @@
 		<commons-io>2.11.0</commons-io>
 		<commons.lang>3.12.0</commons.lang>
 		<httpcomponents>4.3.1</httpcomponents>
-		<solr>9.0.0</solr>
-		<springdata.commons>2.7.2</springdata.commons>
+		<solr>9.1.0</solr>
+		<springdata.commons>2.7.5</springdata.commons>
 		<java-module-name>spring.data.solr</java-module-name>
+		<jodatime>2.12.1</jodatime>
 	</properties>
 
 	<developers>
