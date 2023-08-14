@@ -51,7 +51,8 @@ public class SolrJsonRequest extends SolrRequest<SolrJsonResponse> {
 
 	@Override
 	public String getRequestType() {
-		return SolrRequestType.QUERY.toString();
+
+		return "application/json";
 	}
 
 	private void setContentParser(@Nullable ContentParser requestParser) {

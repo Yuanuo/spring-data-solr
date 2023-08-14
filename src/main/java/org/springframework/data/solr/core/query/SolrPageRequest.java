@@ -15,11 +15,14 @@
  */
 package org.springframework.data.solr.core.query;
 
+import org.springframework.data.domain.OffsetScrollPosition;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.lang.Nullable;
+
+import java.util.Optional;
 
 /**
  * Solr specific implementation of {@code Pageable} allowing zero sized pages.
@@ -67,6 +70,18 @@ public class SolrPageRequest implements Pageable {
 		this.sort = sort;
 	}
 
+	@Override
+	public boolean isPaged() {
+
+		return Pageable.super.isPaged();
+	}
+
+	@Override
+	public boolean isUnpaged() {
+
+		return Pageable.super.isUnpaged();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.data.domain.Pageable#getPageNumber()
@@ -103,6 +118,12 @@ public class SolrPageRequest implements Pageable {
 		return sort != null ? sort : Sort.unsorted();
 	}
 
+	@Override
+	public Sort getSortOr(final Sort sort) {
+
+		return Pageable.super.getSortOr(sort);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.data.domain.Pageable#next()
@@ -131,7 +152,8 @@ public class SolrPageRequest implements Pageable {
 	}
 
 	@Override
-	public Pageable withPage(int pageNumber) {
+	public Pageable withPage(final int pageNumber) {
+
 		return new SolrPageRequest(pageNumber, getPageSize(), getSort());
 	}
 
@@ -142,6 +164,18 @@ public class SolrPageRequest implements Pageable {
 	@Override
 	public boolean hasPrevious() {
 		return page > 0;
+	}
+
+	@Override
+	public Optional<Pageable> toOptional() {
+
+		return Pageable.super.toOptional();
+	}
+
+	@Override
+	public OffsetScrollPosition toScrollPosition() {
+
+		return Pageable.super.toScrollPosition();
 	}
 
 	/**
