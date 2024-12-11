@@ -15,14 +15,13 @@
  */
 package org.springframework.data.solr.core.query;
 
-import org.springframework.data.domain.OffsetScrollPosition;
+import java.util.Objects;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.lang.Nullable;
-
-import java.util.Optional;
 
 /**
  * Solr specific implementation of {@code Pageable} allowing zero sized pages.
@@ -34,6 +33,7 @@ public class SolrPageRequest implements Pageable {
 	private @Nullable Sort sort;
 	private int page;
 	private int size;
+	private @Nullable String cursor;
 
 	/**
 	 * Creates a new {@link SolrPageRequest}. Pages are zero indexed.
@@ -70,16 +70,11 @@ public class SolrPageRequest implements Pageable {
 		this.sort = sort;
 	}
 
-	@Override
-	public boolean isPaged() {
-
-		return Pageable.super.isPaged();
-	}
-
-	@Override
-	public boolean isUnpaged() {
-
-		return Pageable.super.isUnpaged();
+	public SolrPageRequest(int page, int size, String cursor, @Nullable Sort sort) {
+		this.page = page;
+		this.size = size;
+		this.sort = sort;
+		this.cursor = cursor;
 	}
 
 	/*
@@ -118,12 +113,6 @@ public class SolrPageRequest implements Pageable {
 		return sort != null ? sort : Sort.unsorted();
 	}
 
-	@Override
-	public Sort getSortOr(final Sort sort) {
-
-		return Pageable.super.getSortOr(sort);
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.data.domain.Pageable#next()
@@ -151,12 +140,6 @@ public class SolrPageRequest implements Pageable {
 		return new SolrPageRequest(0, getPageSize(), getSort());
 	}
 
-	@Override
-	public Pageable withPage(final int pageNumber) {
-
-		return new SolrPageRequest(pageNumber, getPageSize(), getSort());
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.springframework.data.domain.Pageable#hasPrevious()
@@ -164,18 +147,6 @@ public class SolrPageRequest implements Pageable {
 	@Override
 	public boolean hasPrevious() {
 		return page > 0;
-	}
-
-	@Override
-	public Optional<Pageable> toOptional() {
-
-		return Pageable.super.toOptional();
-	}
-
-	@Override
-	public OffsetScrollPosition toScrollPosition() {
-
-		return Pageable.super.toScrollPosition();
 	}
 
 	/**
@@ -188,38 +159,26 @@ public class SolrPageRequest implements Pageable {
 	}
 
 	@Override
+	public Pageable withPage(int pageNumber) {
+		return new SolrPageRequest(pageNumber, getPageSize(), getSort());
+	}
+	
+	@Override
 	public int hashCode() {
-		int result = sort.hashCode();
-		result = 31 * result + page;
-		result = 31 * result + (size ^ size >>> 32);
-		return result;
+		return Objects.hash(sort, page, size, cursor);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-
-		if (this == obj) {
+		if (this == obj)
 			return true;
-		}
-		if (obj == null || !(obj instanceof Pageable)) {
+		if (obj == null)
 			return false;
-		}
-
-		Pageable other = (Pageable) obj;
-		if (page != other.getPageNumber()) {
+		if (getClass() != obj.getClass())
 			return false;
-		}
-		if (size != other.getPageSize()) {
-			return false;
-		}
-		if (sort == null) {
-			if (other.getSort() != null) {
-				return false;
-			}
-		} else if (!sort.equals(other.getSort())) {
-			return false;
-		}
-		return true;
+		SolrPageRequest other = (SolrPageRequest) obj;
+		return Objects.equals(sort, other.sort) && page == other.page && size == other.size
+				&& Objects.equals(cursor, other.cursor);
 	}
 
 	@Override

@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.SpatialParams;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.GenericConversionService;
@@ -43,12 +44,27 @@ import org.springframework.data.solr.core.convert.NumberConverters;
 import org.springframework.data.solr.core.geo.GeoConverters;
 import org.springframework.data.solr.core.mapping.SolrPersistentEntity;
 import org.springframework.data.solr.core.mapping.SolrPersistentProperty;
-import org.springframework.data.solr.core.query.*;
+import org.springframework.data.solr.core.query.AbstractFacetAndHighlightQueryDecorator;
+import org.springframework.data.solr.core.query.AbstractFacetQueryDecorator;
+import org.springframework.data.solr.core.query.AbstractHighlightQueryDecorator;
+import org.springframework.data.solr.core.query.AbstractQueryDecorator;
+import org.springframework.data.solr.core.query.CalculatedField;
+import org.springframework.data.solr.core.query.Criteria;
 import org.springframework.data.solr.core.query.Criteria.OperationKey;
 import org.springframework.data.solr.core.query.Criteria.Predicate;
+import org.springframework.data.solr.core.query.DistanceField;
+import org.springframework.data.solr.core.query.FacetAndHighlightQuery;
+import org.springframework.data.solr.core.query.FacetQuery;
+import org.springframework.data.solr.core.query.Field;
+import org.springframework.data.solr.core.query.Function;
 import org.springframework.data.solr.core.query.Function.Context;
 import org.springframework.data.solr.core.query.Function.Context.Target;
+import org.springframework.data.solr.core.query.HighlightQuery;
+import org.springframework.data.solr.core.query.Node;
+import org.springframework.data.solr.core.query.Query;
 import org.springframework.data.solr.core.query.Query.Operator;
+import org.springframework.data.solr.core.query.QueryStringHolder;
+import org.springframework.data.solr.core.query.SolrDataQuery;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -401,8 +417,9 @@ public abstract class QueryParserBase<QUERYTPYE extends SolrDataQuery> implement
 		}
 
 		String fromIndex = query.getJoin().getFromIndex() != null ? " fromIndex=" + query.getJoin().getFromIndex() : "";
+		String method = query.getJoin().getMethod() != null ? " method=" + query.getJoin().getMethod() : "";
 		return "{!join from=" + getMappedFieldName(query.getJoin().getFrom(), domainType) + " to="
-				+ getMappedFieldName(query.getJoin().getTo(), domainType) + fromIndex + "}" + queryString;
+				+ getMappedFieldName(query.getJoin().getTo(), domainType) + fromIndex + method + "}" + queryString;
 	}
 
 	/**
@@ -412,13 +429,16 @@ public abstract class QueryParserBase<QUERYTPYE extends SolrDataQuery> implement
 	 * @param offset
 	 * @param rows
 	 */
-	protected void appendPagination(SolrQuery query, @Nullable Long offset, @Nullable Integer rows) {
+	protected void appendPagination(SolrQuery query, @Nullable Long offset, @Nullable Integer rows, @Nullable String cursor) {
 
-		if (offset != null && offset.intValue() >= 0) {
-			query.setStart(offset.intValue());
-		}
 		if (rows != null && rows >= 0) {
 			query.setRows(rows);
+		}
+		if (cursor != null) {
+			query.set(CursorMarkParams.CURSOR_MARK_PARAM, cursor);
+			query.setStart(0);
+		} else if (offset != null && offset.intValue() >= 0) {
+			query.setStart(offset.intValue());
 		}
 	}
 

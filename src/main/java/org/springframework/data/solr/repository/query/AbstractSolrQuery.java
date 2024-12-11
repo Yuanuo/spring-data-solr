@@ -38,8 +38,21 @@ import org.springframework.data.solr.core.SolrTransactionSynchronizationAdapterB
 import org.springframework.data.solr.core.convert.DateTimeConverters;
 import org.springframework.data.solr.core.convert.NumberConverters;
 import org.springframework.data.solr.core.geo.GeoConverters;
-import org.springframework.data.solr.core.query.*;
+import org.springframework.data.solr.core.query.FacetAndHighlightQuery;
+import org.springframework.data.solr.core.query.FacetOptions;
+import org.springframework.data.solr.core.query.FacetQuery;
+import org.springframework.data.solr.core.query.HighlightOptions;
 import org.springframework.data.solr.core.query.HighlightOptions.HighlightParameter;
+import org.springframework.data.solr.core.query.HighlightQuery;
+import org.springframework.data.solr.core.query.Query;
+import org.springframework.data.solr.core.query.SimpleFacetAndHighlightQuery;
+import org.springframework.data.solr.core.query.SimpleFacetQuery;
+import org.springframework.data.solr.core.query.SimpleField;
+import org.springframework.data.solr.core.query.SimpleHighlightQuery;
+import org.springframework.data.solr.core.query.SimpleQuery;
+import org.springframework.data.solr.core.query.SimpleStringCriteria;
+import org.springframework.data.solr.core.query.SolrPageRequest;
+import org.springframework.data.solr.core.query.StatsOptions;
 import org.springframework.data.solr.core.query.StatsOptions.FieldStatsOptions;
 import org.springframework.data.solr.core.query.result.FacetAndHighlightPage;
 import org.springframework.data.solr.core.query.result.FacetPage;
@@ -512,7 +525,7 @@ public abstract class AbstractSolrQuery implements RepositoryQuery {
 
 				if (limit > 0) {
 					if (pageToUse.getOffset() > limit) {
-						return new PageImpl(java.util.Collections.emptyList(), pageToUse, limit);
+						return new PageImpl<Object>(java.util.Collections.emptyList(), pageToUse, limit);
 					}
 					if (pageToUse.getOffset() + pageToUse.getPageSize() > limit) {
 						pageToUse = getLimitingPageable(pageToUse, limit - (int) pageToUse.getOffset());

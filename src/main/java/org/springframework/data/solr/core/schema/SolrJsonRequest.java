@@ -49,12 +49,6 @@ public class SolrJsonRequest extends SolrRequest<SolrJsonResponse> {
 		setContentParser(new MappingJacksonRequestContentParser());
 	}
 
-	@Override
-	public String getRequestType() {
-
-		return "application/json";
-	}
-
 	private void setContentParser(@Nullable ContentParser requestParser) {
 		this.contentParser = requestParser != null ? requestParser : new MappingJacksonRequestContentParser();
 	}
@@ -109,5 +103,12 @@ public class SolrJsonRequest extends SolrRequest<SolrJsonResponse> {
 	protected SolrJsonResponse createResponse(SolrClient client) {
 		return new SolrJsonResponse();
 	}
+
+    // TODO Hardcode this for now, but in reality we'll want to parse this out of the Operation data
+    // somehow
+    @Override
+    public String getRequestType() {
+      return SolrRequestType.ADMIN.toString();
+    }
 
 }

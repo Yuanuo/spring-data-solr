@@ -31,6 +31,9 @@ import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
+import org.springframework.data.repository.query.DefaultParameters;
+import org.springframework.data.repository.query.Parameters;
+import org.springframework.data.repository.query.ParametersSource;
 import org.springframework.data.repository.query.QueryMethod;
 import org.springframework.data.solr.core.query.SpellcheckOptions;
 import org.springframework.data.solr.repository.Facet;
@@ -40,7 +43,6 @@ import org.springframework.data.solr.repository.Query;
 import org.springframework.data.solr.repository.SelectiveStats;
 import org.springframework.data.solr.repository.Spellcheck;
 import org.springframework.data.solr.repository.Stats;
-import org.springframework.data.util.ClassTypeInformation;
 import org.springframework.data.util.TypeInformation;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
@@ -103,7 +105,7 @@ public class SolrQueryMethod extends QueryMethod {
 	}
 
 	TypeInformation<?> getReturnType() {
-		return ClassTypeInformation.fromReturnTypeOf(method);
+		return TypeInformation.fromReturnTypeOf(method);
 	}
 
 	/**
@@ -567,7 +569,6 @@ public class SolrQueryMethod extends QueryMethod {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private List<String> getAnnotationValuesAsStringList(@Nullable Annotation annotation, String attribute) {
 
 		if (annotation == null) {
@@ -590,7 +591,7 @@ public class SolrQueryMethod extends QueryMethod {
 
 		T[] values = (T[]) AnnotationUtils.getValue(annotation, attribute);
 
-		return (List) Arrays.asList(ObjectUtils.toObjectArray(values));
+		return (List<T>) Arrays.asList(ObjectUtils.toObjectArray(values));
 	}
 
 	@Override
@@ -610,13 +611,13 @@ public class SolrQueryMethod extends QueryMethod {
 	}
 
 	@Override
-	protected SolrParameters createParameters(Method method) {
-		return new SolrParameters(method);
+	public SolrParameters getParameters() {
+		return (SolrParameters) super.getParameters();
 	}
 
 	@Override
-	public SolrParameters getParameters() {
-		return (SolrParameters) super.getParameters();
+	protected Parameters<?, ?> createParameters(ParametersSource parametersSource) {
+		return new SolrParameters(parametersSource);
 	}
 
 }

@@ -23,15 +23,15 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.data.repository.cdi.CdiRepositoryExtensionSupport;
+import org.springframework.data.solr.core.SolrOperations;
+
 import jakarta.enterprise.event.Observes;
 import jakarta.enterprise.inject.UnsatisfiedResolutionException;
 import jakarta.enterprise.inject.spi.AfterBeanDiscovery;
 import jakarta.enterprise.inject.spi.Bean;
 import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.enterprise.inject.spi.ProcessBean;
-
-import org.springframework.data.repository.cdi.CdiRepositoryExtensionSupport;
-import org.springframework.data.solr.core.SolrOperations;
 
 /**
  * @author Christoph Strobl
